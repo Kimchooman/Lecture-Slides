@@ -1,4 +1,5 @@
 from image_modules import ImageChanges
+import time
 import cv2
 
 FILE_NAME = "video.mp4"
@@ -57,6 +58,8 @@ else:
 
 	changeManager = ImageChanges(subimage)
 
+	saved_count = 0
+
 	while capture.isOpened(): # Area of interest has been calibrated
 
 		ret, frame = capture.read()
@@ -70,8 +73,15 @@ else:
 
 		changeManager.frame = subimage
 
-		changeManager.eval_change(BWthresh=True, NODES=True)
+		bw_change = changeManager.eval_change(frame_skip=30, BWthresh=True)
+
+		if bw_change == True:
+			cv2.imwrite(f"{saved_count}.jpg", subimage)
+			saved_count += 1
+
 		cv2.imshow("Subimage", subimage)
+
+		#time.sleep(0.25)
 
 		if cv2.waitKey(25) & 0xFF == ord('q'):
 			break
